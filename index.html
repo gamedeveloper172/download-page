@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🎮 Game World</title>
 
-  <!-- AdSense (replace with your own publisher ID) -->
+  <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
           crossorigin="anonymous"></script>
   <script>
@@ -31,41 +31,41 @@
 
     .game-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
       padding: 20px;
-      max-width: 800px;
+      max-width: 960px;
       margin: auto;
     }
 
     .game-card {
-      background-color: #1c1c1c;
+      background-color: #1a1a1a;
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+      box-shadow: 0 0 10px rgba(0,255,255,0.1);
       transition: transform 0.2s;
       text-decoration: none;
+      color: inherit;
     }
 
     .game-card:hover {
       transform: scale(1.05);
     }
 
+    .game-image {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+    }
+
     .game-navbar {
       background-color: #333;
-      padding: 8px;
+      padding: 10px;
       font-size: 14px;
       text-align: center;
       color: #0ff;
       font-weight: bold;
-    }
-
-    .game-image {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
-      display: block;
-      margin: auto;
     }
 
     .adsense-box {
@@ -74,73 +74,68 @@
     }
 
     footer {
-      background-color: #222;
-      padding: 20px;
+      background-color: #181818;
+      padding: 25px 15px;
       text-align: center;
       color: #aaa;
-      font-size: 14px;
-      border-top: 1px solid #444;
+      font-size: 13px;
+      border-top: 1px solid #333;
     }
 
     footer a {
       color: #0ff;
       text-decoration: none;
-      margin: 0 10px;
+      margin: 0 8px;
     }
 
     footer a:hover {
       text-decoration: underline;
     }
+
+    @media screen and (max-width: 480px) {
+      .game-image {
+        height: 120px;
+      }
+    }
   </style>
 </head>
 <body>
 
-<div class="top-navbar">🎮 Game World</div>
+  <!-- 🔝 Top Navbar -->
+  <div class="top-navbar">🎮 Game World</div>
 
-<div class="game-grid">
-  <!-- Game 1 -->
-  <a href="game/Tap-the-Enemy/Tap-the-Enemy.html" class="game-card">
-    <img class="game-image" src="image/enemy.png" alt="Game 1">
-    <div class="game-navbar">To Enemy</div>
-  </a>
+  <!-- 🕹️ Game Grid -->
+  <div class="game-grid">
+    <a href="game/Tap-the-Enemy/Tap-the-Enemy.html" class="game-card">
+      <img class="game-image" src="image/enemy.png" alt="Tap the Enemy">
+      <div class="game-navbar">Tap the Enemy</div>
+    </a>
 
-  <!-- Game 2 -->
-  <a href="game.html?img=image/coler.png" class="game-card">
-    <img class="game-image" src="image/coler.png" alt="Game 2">
-    <div class="game-navbar">Color Matching</div>
-  </a>
+    <a href="game.html?img=image/coler.png" class="game-card">
+      <img class="game-image" src="image/coler.png" alt="Color Match">
+      <div class="game-navbar">Color Match</div>
+    </a>
 
-  <!-- Game 3 -->
-  <a href="game.html?img=https://via.placeholder.com/500" class="game-card">
-    <img class="game-image" src="https://via.placeholder.com/150" alt="Game 3">
-    <div class="game-navbar">PUBG Mobile</div>
-  </a>
+    <a href="game.html?img=https://via.placeholder.com/500" class="game-card">
+      <img class="game-image" src="https://via.placeholder.com/150" alt="PUBG">
+      <div class="game-navbar">PUBG Mobile</div>
+    </a>
 
-  <!-- Game 4 -->
-  <a href="game.html?img=https://via.placeholder.com/600" class="game-card">
-    <img class="game-image" src="https://via.placeholder.com/150" alt="Game 4">
-    <div class="game-navbar">Free Fire</div>
-  </a>
-</div>
+    <a href="game.html?img=https://via.placeholder.com/600" class="game-card">
+      <img class="game-image" src="https://via.placeholder.com/150" alt="Free Fire">
+      <div class="game-navbar">Free Fire</div>
+    </a>
+  </div>
 
-<div class="adsense-box">
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
-       data-ad-slot="1234567890"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-</div>
+  
 
-<footer>
-  &copy; 2025 GameWorld. All rights reserved.<br>
-  <a href="#">Privacy Policy</a> |
-  <a href="#">Terms of Service</a> |
-  <a href="#">Contact Us</a>
-</footer>
+  <!-- 📄 Footer -->
+  <footer>
+    &copy; 2025 Game World. All rights reserved.<br>
+    <a href="#">Privacy Policy</a> |
+    <a href="#">Terms of Service</a> |
+    <a href="#">Contact Us</a>
+  </footer>
 
 </body>
 </html>
