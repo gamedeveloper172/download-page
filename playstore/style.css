@@ -1,0 +1,108 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background: #f9f9f9;
+  color: #222;
+}
+
+.app-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 0 10px #ccc;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.app-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+}
+
+.app-info h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.company {
+  color: #0077cc;
+}
+
+.meta, .details span {
+  color: #777;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.install-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #0b9d58;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.availability {
+  color: #666;
+  font-size: 13px;
+}
+
+.screenshots {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.screenshots img {
+  width: 30%;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.section {
+  margin: 20px 0;
+}
+
+.data-points li {
+  margin: 8px 0;
+}
+
+.rating-summary h3 {
+  font-size: 32px;
+  color: #0b9d58;
+}
+
+.bar-graph div {
+  font-size: 14px;
+  margin: 3px 0;
+}
+
+.review {
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.user-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.user-name {
+  font-weight: bold;
+}
+
+.review-text {
+  margin: 10px 0;
+}
