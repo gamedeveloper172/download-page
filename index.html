@@ -20,7 +20,6 @@
       color: #fff;
     }
 
-    /* NAVBAR at top */
     .top-navbar {
       background-color: #222;
       padding: 15px;
@@ -30,7 +29,6 @@
       border-bottom: 2px solid #0ff;
     }
 
-    /* GAME GRID */
     .game-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -46,6 +44,7 @@
       overflow: hidden;
       box-shadow: 0 0 10px rgba(0,255,255,0.2);
       transition: transform 0.2s;
+      text-decoration: none;
     }
 
     .game-card:hover {
@@ -69,13 +68,11 @@
       margin: auto;
     }
 
-    /* ADSENSE BOX */
     .adsense-box {
       text-align: center;
       margin: 30px 0;
     }
 
-    /* FOOTER */
     footer {
       background-color: #222;
       padding: 20px;
@@ -98,38 +95,34 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
 <div class="top-navbar">🎮 Game World</div>
 
-<!-- GAME GRID at Top -->
 <div class="game-grid">
   <!-- Game 1 -->
-  <div class="game-card">
+  <a href="game.html?img=image/enemy.png" class="game-card">
     <img class="game-image" src="image/enemy.png" alt="Game 1">
     <div class="game-navbar">To Enemy</div>
-  </div>
+  </a>
 
   <!-- Game 2 -->
-  <div class="game-card">
+  <a href="game.html?img=image/coler.png" class="game-card">
     <img class="game-image" src="image/coler.png" alt="Game 2">
-    <div class="game-navbar">Coler Matching </div>
-  </div>
+    <div class="game-navbar">Color Matching</div>
+  </a>
 
   <!-- Game 3 -->
-  <div class="game-card">
+  <a href="game.html?img=https://via.placeholder.com/500" class="game-card">
     <img class="game-image" src="https://via.placeholder.com/150" alt="Game 3">
     <div class="game-navbar">PUBG Mobile</div>
-  </div>
+  </a>
 
   <!-- Game 4 -->
-  <div class="game-card">
+  <a href="game.html?img=https://via.placeholder.com/600" class="game-card">
     <img class="game-image" src="https://via.placeholder.com/150" alt="Game 4">
     <div class="game-navbar">Free Fire</div>
-  </div>
-
+  </a>
 </div>
 
-<!-- ADSENSE (optional middle ad) -->
 <div class="adsense-box">
   <ins class="adsbygoogle"
        style="display:block"
@@ -142,7 +135,6 @@
   </script>
 </div>
 
-<!-- FOOTER -->
 <footer>
   &copy; 2025 GameWorld. All rights reserved.<br>
   <a href="#">Privacy Policy</a> |
