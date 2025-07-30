@@ -1,1 +1,154 @@
-.
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎮 Game World</title>
+
+  <!-- AdSense (replace with your own publisher ID) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+          crossorigin="anonymous"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #111;
+      color: #fff;
+    }
+
+    /* NAVBAR at top */
+    .top-navbar {
+      background-color: #222;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+      color: #0ff;
+      border-bottom: 2px solid #0ff;
+    }
+
+    /* GAME GRID */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .game-card {
+      background-color: #1c1c1c;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+      transition: transform 0.2s;
+    }
+
+    .game-card:hover {
+      transform: scale(1.05);
+    }
+
+    .game-navbar {
+      background-color: #333;
+      padding: 8px;
+      font-size: 14px;
+      text-align: center;
+      color: #0ff;
+      font-weight: bold;
+    }
+
+    .game-image {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+      margin: auto;
+    }
+
+    /* ADSENSE BOX */
+    .adsense-box {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    /* FOOTER */
+    footer {
+      background-color: #222;
+      padding: 20px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      border-top: 1px solid #444;
+    }
+
+    footer a {
+      color: #0ff;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="top-navbar">🎮 Game World</div>
+
+<!-- GAME GRID at Top -->
+<div class="game-grid">
+  <!-- Game 1 -->
+  <div class="game-card">
+    <img class="game-image" src="https://via.placeholder.com/150" alt="Game 1">
+    <div class="game-navbar">Super Mario</div>
+  </div>
+
+  <!-- Game 2 -->
+  <div class="game-card">
+    <img class="game-image" src="https://via.placeholder.com/150" alt="Game 2">
+    <div class="game-navbar">Need for Speed</div>
+  </div>
+
+  <!-- Game 3 -->
+  <div class="game-card">
+    <img class="game-image" src="https://via.placeholder.com/150" alt="Game 3">
+    <div class="game-navbar">PUBG Mobile</div>
+  </div>
+
+  <!-- Game 4 -->
+  <div class="game-card">
+    <img class="game-image" src="https://via.placeholder.com/150" alt="Game 4">
+    <div class="game-navbar">Free Fire</div>
+  </div>
+
+</div>
+
+<!-- ADSENSE (optional middle ad) -->
+<div class="adsense-box">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
+       data-ad-slot="1234567890"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  &copy; 2025 GameWorld. All rights reserved.<br>
+  <a href="#">Privacy Policy</a> |
+  <a href="#">Terms of Service</a> |
+  <a href="#">Contact Us</a>
+</footer>
+
+</body>
+</html>
