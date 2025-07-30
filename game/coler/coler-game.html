@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Color Match - Play</title>
+  <style>
+    body {
+      margin: 0;
+      background: #1a1a1a;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin-bottom: 0;
+      font-size: 36px;
+      color: #00cc99;
+      user-select: none;
+    }
+
+    #game-area {
+      margin-top: 20px;
+      position: relative;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: conic-gradient(
+        red 0deg 60deg,
+        green 60deg 120deg,
+        blue 120deg 180deg,
+        yellow 180deg 240deg,
+        purple 240deg 300deg,
+        orange 300deg 360deg
+      );
+      box-shadow: 0 0 25px #00cc99;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    #pointer {
+      position: absolute;
+      width: 6px;
+      height: 150px;
+      background: #00cc99;
+      top: 10px;
+      left: calc(50% - 3px);
+      border-radius: 3px;
+      transform-origin: bottom center;
+      transition: background 0.2s;
+      pointer-events: none;
+    }
+
+    #target-color {
+      margin-top: 25px;
+      font-size: 24px;
+      color: #00cc99;
+      user-select: none;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    #score {
+      margin-top: 15px;
+      font-size: 20px;
+      color: #ccc;
+      user-select: none;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #ff5555;
+      user-select: none;
+      min-height: 24px;
+      height: 24px;
+    }
+
+    button#restart-btn {
+      margin-top: 20px;
+      padding: 10px 24px;
+      font-size: 18px;
+      background: #00cc99;
+      border: none;
+      border-radius: 8px;
+      color: #111;
+      cursor: pointer;
+      user-select: none;
+      display: none;
+      box-shadow: 0 4px 10px #00cc99aa;
+      transition: background 0.3s ease;
+    }
+
+    button#restart-btn:hover {
+      background: #00b07a;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Color Match</h1>
+  <div id="game-area">
+    <div id="pointer"></div>
+  </div>
+  <div id="target-color">RED</div>
+  <div id="score">Score: 0</div>
+  <div id="message"></div>
+  <button id="restart-btn">Restart Game</button>
+
+  <script>
+    const colors = ['RED', 'GREEN', 'BLUE', 'YELLOW', 'PURPLE', 'ORANGE'];
+    let targetColor = '';
+    let score = 0;
+    let spinning = true;
+    let rotation = 0;
+    let speed = 3; // degrees per frame
+    let pointer = document.getElementById('pointer');
+    let targetColorElem = document.getElementById('target-color');
+    let scoreElem = document.getElementById('score');
+    let messageElem = document.getElementById('message');
+    let restartBtn = document.getElementById('restart-btn');
+    let animationId;
+
+    function pickRandomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function getColorAngle(color) {
+      let index = colors.indexOf(color);
+      let slice = 360 / colors.length;
+      return index * slice + slice / 2;
+    }
+
+    function updateTargetColor() {
+      targetColor = pickRandomColor();
+      targetColorElem.textContent = targetColor;
+    }
+
+    function resetGame() {
+      score = 0;
+      speed = 3;
+      rotation = 0;
+      spinning = true;
+      updateTargetColor();
+      scoreElem.textContent = 'Score: ' + score;
+      messageElem.textContent = '';
+      restartBtn.style.display = 'none';
+      animate();
+    }
+
+    function animate() {
+      if (!spinning) return;
+      rotation = (rotation + speed) % 360;
+      pointer.style.transform = `rotate(${rotation}deg)`;
+      animationId = requestAnimationFrame(animate);
+    }
+
+    function isMatch() {
+      let pointerAngle = (rotation + 360) % 360;
+      let targetAngle = getColorAngle(targetColor);
+      let diff = Math.abs(pointerAngle - targetAngle);
+      if (diff > 180) diff = 360 - diff;
+
+      let tolerance = 20 + (speed > 10 ? 10 : 0);
+      console.log(`Pointer: ${pointerAngle.toFixed(1)}°, Target(${targetColor}): ${targetAngle.toFixed(1)}°, Diff: ${diff.toFixed(1)}°`);
+
+      return diff <= tolerance;
+    }
+
+    document.getElementById('game-area').addEventListener('click', () => {
+      if (!spinning) return;
+      if (isMatch()) {
+        score++;
+        speed += 0.7;
+        scoreElem.textContent = 'Score: ' + score;
+        messageElem.style.color = '#00ff88';
+        messageElem.textContent = '✔️ Correct!';
+        updateTargetColor();
+      } else {
+        spinning = false;
+        messageElem.style.color = '#ff5555';
+        messageElem.textContent = '❌ Wrong! Game Over.';
+        restartBtn.style.display = 'inline-block';
+        cancelAnimationFrame(animationId);
+      }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      resetGame();
+    });
+
+    resetGame();
+  </script>
+</body>
+
+</html>
