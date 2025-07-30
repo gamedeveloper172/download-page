@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sliding Puzzle Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
 
+    h1 {
+      color: #00cc99;
+      margin-bottom: 10px;
+    }
+
+    #timer {
+      font-size: 20px;
+      color: #00ffcc;
+      margin-bottom: 20px;
+    }
+
+    #puzzle {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      grid-template-rows: repeat(4, 80px);
+      gap: 4px;
+    }
+
+    .tile {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #00cc99;
+      font-size: 24px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      user-select: none;
+    }
+
+    .empty {
+      background-color: transparent;
+      cursor: default;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #66ff99;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sliding Puzzle</h1>
+  <div id="timer">Time: 00:00</div>
+  <div id="puzzle"></div>
+  <div id="message"></div>
+
+  <script>
+    const puzzle = document.getElementById('puzzle');
+    const message = document.getElementById('message');
+    const timerEl = document.getElementById('timer');
+
+    let tiles = [];
+    let emptyIndex = 15;
+    let startTime = null;
+    let timerInterval = null;
+    let started = false;
+
+    function initPuzzle() {
+      tiles = [...Array(15).keys()].map(n => n + 1);
+      tiles.push(null); // empty tile
+      shuffleTiles();
+      drawPuzzle();
+    }
+
+    function shuffleTiles() {
+      do {
+        for (let i = tiles.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+        }
+      } while (!isSolvable(tiles));
+      emptyIndex = tiles.indexOf(null);
+    }
+
+    function isSolvable(arr) {
+      let inversions = 0;
+      for (let i = 0; i < 15; i++) {
+        for (let j = i + 1; j < 15; j++) {
+          if (arr[i] && arr[j] && arr[i] > arr[j]) inversions++;
+        }
+      }
+      const row = Math.floor(arr.indexOf(null) / 4);
+      return (inversions + row) % 2 === 0;
+    }
+
+    function drawPuzzle() {
+      puzzle.innerHTML = '';
+      tiles.forEach((tile, i) => {
+        const div = document.createElement('div');
+        div.className = tile ? 'tile' : 'tile empty';
+        div.textContent = tile || '';
+        div.addEventListener('click', () => moveTile(i));
+        puzzle.appendChild(div);
+      });
+    }
+
+    function moveTile(index) {
+      const row = Math.floor(index / 4);
+      const col = index % 4;
+      const emptyRow = Math.floor(emptyIndex / 4);
+      const emptyCol = emptyIndex % 4;
+
+      const distance = Math.abs(row - emptyRow) + Math.abs(col - emptyCol);
+      if (distance === 1) {
+        [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
+        emptyIndex = index;
+        drawPuzzle();
+
+        if (!started) {
+          startTimer();
+          started = true;
+        }
+
+        if (checkWin()) {
+          stopTimer();
+          message.textContent = `🎉 You Win! Time: ${timerEl.textContent.split(' ')[1]}`;
+        }
+      }
+    }
+
+    function checkWin() {
+      for (let i = 0; i < 15; i++) {
+        if (tiles[i] !== i + 1) return false;
+      }
+      return true;
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        const seconds = String(elapsed % 60).padStart(2, '0');
+        timerEl.textContent = `Time: ${minutes}:${seconds}`;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+    }
+
+    initPuzzle();
+  </script>
+</body>
+</html>
