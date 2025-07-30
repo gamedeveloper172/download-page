@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phaser 2D Game Without Music</title>
+<style>
+  body {
+    margin: 0;
+    background: linear-gradient(270deg, #0ff, #08f, #00f, #0ff);
+    background-size: 800% 800%;
+    animation: gradientBG 15s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    user-select: none;
+  }
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  #game {
+    border: 4px solid #0ff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px #0ff;
+    width: 360px;
+    height: 640px;
+    background: #111;
+    overflow: hidden;
+  }
+</style>
+</head>
+<body>
+  <div id="game"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+  <script>
+    let score = 0;
+    let highScore = localStorage.getItem('highScore') || 0;
+    let scoreText, timerText, enemy, startText, gameOverText, startButton;
+    let timeLeft = 30;
+    let timer;
+    let gameStarted = false;
+
+    const config = {
+      type: Phaser.AUTO,
+      width: 360,
+      height: 640,
+      backgroundColor: '#111',
+      parent: 'game',
+      scene: { preload, create, update }
+    };
+
+    const game = new Phaser.Game(config);
+
+    function preload() {
+      this.load.image('enemy', 'Game/assets/enemy.png'); // Adjust path as needed
+    }
+
+    function create() {
+      scoreText = this.add.text(10, 10, '', { fontSize: '24px', fill: '#0ff', fontFamily: 'Arial' });
+      timerText = this.add.text(240, 10, '', { fontSize: '24px', fill: '#0ff', fontFamily: 'Arial' });
+
+      enemy = this.add.image(180, 320, 'enemy')
+        .setScale(0.5)
+        .setAlpha(0)
+        .setInteractive({ useHandCursor: true });
+
+      enemy.on('pointerdown', () => {
+        if (!gameStarted) return;
+        score++;
+        scoreText.setText(`Score: ${score}`);
+
+        if (score % 10 === 0) {
+          timeLeft += 5;
+        }
+
+        moveEnemy.call(this);
+      });
+
+      this.tweens.add({
+        targets: enemy,
+        y: '+=10',
+        yoyo: true,
+        repeat: -1,
+        duration: 600,
+        ease: 'Sine.easeInOut'
+      });
+
+      startText = this.add.text(60, 250, 'Tap the Enemy!', {
+        fontSize: '36px',
+        fill: '#0ff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        stroke: '#000',
+        strokeThickness: 4,
+      });
+
+      startButton = this.add.text(120, 320, '▶️ Start Game', {
+        fontSize: '22px',
+        backgroundColor: '#0ff',
+        color: '#000',
+        padding: { x: 12, y: 7 },
+        borderRadius: 12,
+        fontFamily: 'Arial',
+        fontWeight: 'bold',
+      }).setInteractive({ useHandCursor: true });
+
+      startButton.on('pointerdown', () => startGame.call(this));
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      gameStarted = true;
+
+      startText.setVisible(false);
+      startButton.setVisible(false);
+      enemy.setAlpha(1);
+      scoreText.setText('Score: 0');
+      timerText.setText('30s');
+      moveEnemy.call(this);
+
+      timer = this.time.addEvent({
+        delay: 1000,
+        callback: () => {
+          timeLeft--;
+          timerText.setText(`${timeLeft}s`);
+          if (timeLeft <= 0) {
+            endGame.call(this);
+          }
+        },
+        loop: true,
+      });
+    }
+
+    function endGame() {
+      this.scene.pause();
+      enemy.setAlpha(0);
+      gameStarted = false;
+
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('highScore', highScore);
+      }
+
+      gameOverText = this.add.text(60, 300, `Game Over!\nScore: ${score}\nHigh Score: ${highScore}`, {
+        fontSize: '22px',
+        fill: '#f00',
+        fontFamily: 'Arial',
+        fontWeight: 'bold',
+        align: 'center',
+        stroke: '#000',
+        strokeThickness: 3,
+      });
+
+      this.time.delayedCall(3000, () => {
+        gameOverText.destroy();
+        this.scene.restart();
+      });
+    }
+
+    function update() {}
+
+    function moveEnemy() {
+      const x = Phaser.Math.Between(50, 310);
+      const y = Phaser.Math.Between(100, 590);
+      enemy.setPosition(x, y);
+
+      enemy.setAlpha(0);
+      this.tweens.add({
+        targets: enemy,
+        alpha: 1,
+        duration: 250,
+      });
+    }
+  </script>
+</body>
+</html>
