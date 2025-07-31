@@ -1,1 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+  <meta charset="UTF-8" />
+  <title>Lucky Number Game</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #fceabb, #f8b500);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .slot-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .slot {
+      width: 80px;
+      height: 80px;
+      font-size: 40px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      font-weight: bold;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: #219150;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .win {
+      color: green;
+    }
+
+    .lose {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🎰 Lucky Number Game</h1>
+
+  <div class="slot-container">
+    <div class="slot" id="slot1">0</div>
+    <div class="slot" id="slot2">0</div>
+    <div class="slot" id="slot3">0</div>
+  </div>
+
+  <button onclick="spinSlots()" id="spinBtn">🎲 Spin</button>
+
+  <div id="result"></div>
+
+  <script>
+    let spinCount = 0;
+    let interval;
+
+    function getRandomDigit() {
+      return Math.floor(Math.random() * 9) + 1;
+    }
+
+    function spinSlots() {
+      const slot1 = document.getElementById('slot1');
+      const slot2 = document.getElementById('slot2');
+      const slot3 = document.getElementById('slot3');
+      const result = document.getElementById('result');
+      const spinBtn = document.getElementById('spinBtn');
+
+      spinBtn.disabled = true;
+      result.textContent = "";
+      result.className = "";
+      spinCount++;
+
+      interval = setInterval(() => {
+        slot1.textContent = getRandomDigit();
+        slot2.textContent = getRandomDigit();
+        slot3.textContent = getRandomDigit();
+      }, 100);
+
+      setTimeout(() => {
+        clearInterval(interval);
+
+        let num1, num2, num3;
+
+        if (spinCount % 3 === 0) {
+          const lucky = getRandomDigit(); // randomly picks a number between 1-9
+          num1 = num2 = num3 = lucky;     // assigns that number to all slots
+        }
+        else {
+          // Regular random numbers
+          num1 = getRandomDigit();
+          num2 = getRandomDigit();
+          num3 = getRandomDigit();
+        }
+
+        slot1.textContent = num1;
+        slot2.textContent = num2;
+        slot3.textContent = num3;
+
+        if (num1 === num2 && num2 === num3) {
+          result.textContent = `🎉 ${num1}${num2}${num3} - You Win!`;
+          result.className = 'win';
+        } else {
+          result.textContent = `😢 ${num1}${num2}${num3} - Try Again!`;
+          result.className = 'lose';
+        }
+
+        spinBtn.disabled = false;
+      }, 5000); // spin animation for 5 seconds
+    }
+  </script>
+</body>
+
+</html>
