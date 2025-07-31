@@ -31,14 +31,22 @@
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
+      z-index: 2;
     }
     .item {
       position: absolute;
       width: 8vw;
       max-width: 40px;
+      height: auto;
+      z-index: 1;
+    }
+    .fruit-img {
+      width: 100%;
+      height: auto;
+    }
+    .poop {
       font-size: 6vw;
       text-align: center;
-      z-index: 1;
     }
     #score, #lives {
       position: absolute;
@@ -46,7 +54,7 @@
       font-size: 1.2em;
       font-weight: bold;
       color: #333;
-      z-index: 2;
+      z-index: 3;
     }
     #score { left: 15px; }
     #lives { right: 15px; color: red; }
@@ -115,7 +123,12 @@
     let speed = 2.5;
     let intervalId;
 
-    const fruits = ["🍌", "🥭", "🍎", "🍫"];
+    const fruits = [
+      { img: "https://cdn-icons-png.flaticon.com/512/590/590685.png", name: "banana" },
+      { img: "https://cdn-icons-png.flaticon.com/512/135/135620.png", name: "mango" },
+      { img: "https://cdn-icons-png.flaticon.com/512/415/415682.png", name: "apple" },
+      { img: "https://cdn-icons-png.flaticon.com/512/1046/1046690.png", name: "chocolate" }
+    ];
     const poop = "💩";
 
     function updateBasketPosition() {
@@ -142,9 +155,22 @@
     function spawnItem() {
       const item = document.createElement("div");
       item.classList.add("item");
+
       const isFruit = Math.random() > 0.25;
-      item.innerText = isFruit ? fruits[Math.floor(Math.random() * fruits.length)] : poop;
-      item.dataset.type = isFruit ? "fruit" : "poop";
+      if (isFruit) {
+        const fruit = fruits[Math.floor(Math.random() * fruits.length)];
+        const img = document.createElement("img");
+        img.src = fruit.img;
+        img.alt = fruit.name;
+        img.classList.add("fruit-img");
+        item.appendChild(img);
+        item.dataset.type = "fruit";
+      } else {
+        item.innerHTML = poop;
+        item.classList.add("poop");
+        item.dataset.type = "poop";
+      }
+
       item.style.left = Math.random() * (window.innerWidth - 40) + "px";
       item.style.top = "0px";
       game.appendChild(item);
