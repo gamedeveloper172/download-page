@@ -8,248 +8,181 @@
     * { box-sizing: border-box; padding: 0; margin: 0; }
     html, body {
       height: 100%;
-      font-family: Arial, sans-serif;
-      background: #e0f7fa;
+      font-family: sans-serif;
+      background-color: #dff9fb;
       overflow: hidden;
     }
     #game {
       position: relative;
-      width: 100vw;
+      width: 100%;
       height: 100vh;
-      touch-action: none;
+    }
+    #scoreBoard {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+    }
+    #poopCount {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: red;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .falling {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      user-select: none;
     }
     #basket {
       position: absolute;
-      bottom: 5%;
+      bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-      width: 18vw;
-      max-width: 100px;
+      width: 100px;
       height: auto;
-      aspect-ratio: 1.5 / 1;
-      background-image: url('https://cdn-icons-png.flaticon.com/512/3660/3660037.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
+      user-select: none;
       z-index: 2;
     }
-    .item {
+    #playBtn {
       position: absolute;
-      width: 8vw;
-      max-width: 40px;
-      height: auto;
-      z-index: 1;
-    }
-    .fruit-img {
-      width: 100%;
-      height: auto;
-    }
-    .poop {
-      font-size: 6vw;
-      text-align: center;
-    }
-    #score, #lives {
-      position: absolute;
-      top: 10px;
-      font-size: 1.2em;
-      font-weight: bold;
-      color: #333;
-      z-index: 3;
-    }
-    #score { left: 15px; }
-    #lives { right: 15px; color: red; }
-
-    #overlay {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.95);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-      text-align: center;
-      padding: 20px;
-    }
-
-    #overlay h1 {
-      font-size: 2em;
-      margin-bottom: 20px;
-      color: #ff4081;
-    }
-
-    #playBtn, #replayBtn {
-      padding: 12px 30px;
-      font-size: 1.2em;
-      cursor: pointer;
-      border: none;
-      background-color: #00bcd4;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      padding: 15px 30px;
+      background-color: #130f40;
       color: white;
-      border-radius: 8px;
-      transition: 0.3s;
-      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 10;
     }
-
-    #playBtn:hover, #replayBtn:hover {
-      background-color: #0097a7;
+    #gameOver {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 30px;
+      font-weight: bold;
+      color: red;
+      display: none;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
   <div id="game">
-    <div id="score">Score: 0</div>
-    <div id="lives">💩 x 0</div>
-    <div id="basket"></div>
-
-    <div id="overlay">
-      <h1>🍌 Catch Fruits, Avoid 💩</h1>
-      <button id="playBtn">▶️ Play Game</button>
-    </div>
+    <div id="scoreBoard">Score: 0</div>
+    <div id="poopCount">💩 x <span id="poop">0</span></div>
+    <div id="gameOver">Game Over 💩</div>
+    <button id="playBtn">▶️ Play</button>
+    
+    <!-- ✅ Updated basket image -->
+    <img id="basket" src="https://gallery.yopriceville.com/var/albums/Free-Clipart-Pictures/Decorative-Elements-PNG/Basket_PNG_Clipart.png
+" />
   </div>
 
   <script>
     const game = document.getElementById("game");
+    const scoreBoard = document.getElementById("scoreBoard");
+    const poopDisplay = document.getElementById("poop");
     const basket = document.getElementById("basket");
-    const scoreEl = document.getElementById("score");
-    const livesEl = document.getElementById("lives");
-    const overlay = document.getElementById("overlay");
     const playBtn = document.getElementById("playBtn");
+    const gameOverText = document.getElementById("gameOver");
 
-    let basketX;
     let score = 0;
-    let lives = 0;
-    let gameRunning = false;
-    let speed = 2.5;
-    let intervalId;
+    let poopCount = 0;
+    let isGameOver = false;
+    let speed = 2;
+    let dropInterval;
 
-    const fruits = [
-      { img: "https://cdn-icons-png.flaticon.com/512/590/590685.png", name: "banana" },
-      { img: "https://cdn-icons-png.flaticon.com/512/135/135620.png", name: "mango" },
-      { img: "https://cdn-icons-png.flaticon.com/512/415/415682.png", name: "apple" },
-      { img: "https://cdn-icons-png.flaticon.com/512/1046/1046690.png", name: "chocolate" }
-    ];
+    const fruits = ["🍎", "🍌", "🍊", "🍓", "🍉", "🍇", "🍍", "🍒"];
     const poop = "💩";
 
-    function updateBasketPosition() {
-      basket.style.left = basketX + "px";
-    }
-
-    function startGame() {
-      overlay.style.display = "none";
-      basketX = window.innerWidth / 2 - basket.offsetWidth / 2;
-      updateBasketPosition();
-      score = 0;
-      lives = 0;
-      speed = 2.5;
-      gameRunning = true;
-      scoreEl.innerText = "Score: 0";
-      livesEl.innerText = "💩 x 0";
-
-      intervalId = setInterval(() => {
-        if (gameRunning) spawnItem();
-        if (speed < 8) speed += 0.01;
-      }, 800);
-    }
-
-    function spawnItem() {
-      const item = document.createElement("div");
-      item.classList.add("item");
-
-      const isFruit = Math.random() > 0.25;
-      if (isFruit) {
-        const fruit = fruits[Math.floor(Math.random() * fruits.length)];
-        const img = document.createElement("img");
-        img.src = fruit.img;
-        img.alt = fruit.name;
-        img.classList.add("fruit-img");
-        item.appendChild(img);
-        item.dataset.type = "fruit";
-      } else {
-        item.innerHTML = poop;
-        item.classList.add("poop");
-        item.dataset.type = "poop";
+    // Move basket with arrow keys
+    document.addEventListener("keydown", (e) => {
+      const left = basket.offsetLeft;
+      if (e.key === "ArrowLeft" && left > 10) {
+        basket.style.left = left - 30 + "px";
+      } else if (e.key === "ArrowRight" && left < window.innerWidth - 110) {
+        basket.style.left = left + 30 + "px";
       }
+    });
 
+    function dropItem() {
+      if (isGameOver) return;
+
+      const item = document.createElement("div");
+      item.classList.add("falling");
+      item.innerText = Math.random() < 0.2 ? poop : fruits[Math.floor(Math.random() * fruits.length)];
       item.style.left = Math.random() * (window.innerWidth - 40) + "px";
-      item.style.top = "0px";
+      item.style.top = "-40px";
       game.appendChild(item);
 
-      let itemY = 0;
       const fall = setInterval(() => {
-        if (!gameRunning) {
-          clearInterval(fall);
-          return;
-        }
-        itemY += speed;
-        item.style.top = itemY + "px";
+        const itemTop = item.offsetTop;
+        if (itemTop > window.innerHeight - 100) {
+          const itemLeft = item.offsetLeft;
+          const basketLeft = basket.offsetLeft;
 
-        const itemX = parseFloat(item.style.left);
-        const basketRect = basket.getBoundingClientRect();
-        const itemRect = item.getBoundingClientRect();
-
-        const caught = (
-          itemY + item.offsetHeight >= basketRect.top &&
-          itemX + item.offsetWidth >= basketRect.left &&
-          itemX <= basketRect.right
-        );
-
-        if (caught) {
-          if (item.dataset.type === "fruit") {
-            score++;
-            scoreEl.innerText = "Score: " + score;
+          // Check collision
+          if (itemLeft > basketLeft - 40 && itemLeft < basketLeft + 100) {
+            if (item.innerText === poop) {
+              poopCount++;
+              poopDisplay.innerText = poopCount;
+              if (poopCount >= 3) {
+                endGame();
+              }
+            } else {
+              score++;
+              scoreBoard.innerText = "Score: " + score;
+              if (score % 10 === 0) speed += 0.5;
+            }
+            item.remove();
+            clearInterval(fall);
+          } else if (itemTop > window.innerHeight - 40) {
+            item.remove();
+            clearInterval(fall);
           } else {
-            lives++;
-            livesEl.innerText = "💩 x " + lives;
-            if (lives >= 3) endGame();
+            item.style.top = itemTop + speed + "px";
           }
-          clearInterval(fall);
-          item.remove();
-        } else if (itemY > window.innerHeight) {
-          clearInterval(fall);
-          item.remove();
+        } else {
+          item.style.top = itemTop + speed + "px";
         }
       }, 20);
     }
 
-    function endGame() {
-      gameRunning = false;
-      clearInterval(intervalId);
-      overlay.innerHTML = `
-        <h1>😵 Game Over!</h1>
-        <p>Score: ${score}</p>
-        <button id="replayBtn">🔁 Play Again</button>
-      `;
-      overlay.style.display = "flex";
-      document.getElementById("replayBtn").onclick = startGame;
+    function startGame() {
+      // Clear all falling items
+      document.querySelectorAll(".falling").forEach(el => el.remove());
+
+      score = 0;
+      poopCount = 0;
+      isGameOver = false;
+      speed = 2;
+      scoreBoard.innerText = "Score: 0";
+      poopDisplay.innerText = "0";
+      gameOverText.style.display = "none";
+      playBtn.style.display = "none";
+      dropInterval = setInterval(dropItem, 800);
     }
 
-    // Keyboard control
-    document.addEventListener("keydown", (e) => {
-      if (!gameRunning) return;
-      const moveAmount = window.innerWidth * 0.05;
-      if (e.key === "ArrowLeft") basketX -= moveAmount;
-      if (e.key === "ArrowRight") basketX += moveAmount;
-      basketX = Math.max(0, Math.min(window.innerWidth - basket.offsetWidth, basketX));
-      updateBasketPosition();
-    });
-
-    // Touch swipe control
-    let touchStartX = null;
-    game.addEventListener("touchstart", (e) => {
-      if (!gameRunning) return;
-      touchStartX = e.touches[0].clientX;
-    });
-
-    game.addEventListener("touchmove", (e) => {
-      if (!gameRunning || touchStartX === null) return;
-      const touchX = e.touches[0].clientX;
-      const deltaX = touchX - touchStartX;
-      basketX += deltaX;
-      basketX = Math.max(0, Math.min(window.innerWidth - basket.offsetWidth, basketX));
-      updateBasketPosition();
-      touchStartX = touchX;
-    });
+    function endGame() {
+      isGameOver = true;
+      clearInterval(dropInterval);
+      gameOverText.style.display = "block";
+      playBtn.innerText = "🔁 Play Again";
+      playBtn.style.display = "block";
+    }
 
     playBtn.onclick = startGame;
   </script>
