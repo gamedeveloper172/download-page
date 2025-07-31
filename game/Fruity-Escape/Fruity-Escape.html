@@ -1,90 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🍌 Fruit Catcher Game</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%;
-      font-family: sans-serif;
-      background-color: #dff9fb;
-      overflow: hidden;
-    }
-    #game {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      touch-action: pan-y;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; background:#dff9fb; overflow:hidden; font-family:sans-serif;}
+    #game { position:relative; width:100%; height:100vh; }
     #scoreBoard, #poopCount {
-      position: absolute;
-      top: 10px;
-      font-size: 22px;
-      font-weight: bold;
-      color: #333;
-      z-index: 5;
+      position:absolute; top:10px; font-size:22px; font-weight:bold; color:#333; z-index:5;
     }
-    #scoreBoard { left: 20px; }
-    #poopCount {
-      right: 20px;
-      color: red;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    #scoreBoard { left:20px }
+    #poopCount { right:20px; color:red; display:flex; align-items:center; gap:6px; }
     .falling {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      user-select: none;
-      font-size: 32px;
-      text-align: center;
+      position:absolute; width:40px; height:40px; font-size:32px; text-align:center;
+      user-select:none;
     }
     #basket {
-      position: absolute;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: auto;
-      user-select: none;
-      z-index: 3;
+      position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+      width:90px; height:auto; z-index:3; user-select:none;
+      transition:left 0.05s linear;
     }
-    #playBtn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 24px;
-      padding: 15px 30px;
-      background-color: #130f40;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      z-index: 10;
+    #playBtn, #gameOver {
+      position:absolute; left:50%; transform:translateX(-50%); font-size:24px;
+      padding:15px 30px; cursor:pointer; z-index:10; border:none; border-radius:10px;
     }
-    #gameOver {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 30px;
-      font-weight: bold;
-      color: red;
-      display: none;
-      z-index: 10;
-    }
+    #playBtn { top:50%; background:#130f40; color:white; }
+    #gameOver { top:40%; color:red; display:none; font-weight:bold; }
   </style>
 </head>
 <body>
   <div id="game">
     <div id="scoreBoard">Score: 0</div>
     <div id="poopCount">💩 x <span id="poop">0</span></div>
-    <div id="gameOver">Game Over 💩</div>
     <button id="playBtn">▶️ Play</button>
+    <div id="gameOver">Game Over 💩</div>
     <img id="basket" src="https://gallery.yopriceville.com/var/albums/Free-Clipart-Pictures/Decorative-Elements-PNG/Basket_PNG_Clipart.png" alt="Basket"/>
   </div>
 
@@ -94,98 +45,62 @@
     const poopDisplay = document.getElementById("poop");
     const basket = document.getElementById("basket");
     const playBtn = document.getElementById("playBtn");
-    const gameOverText = document.getElementById("gameOver");
+    const gameOver = document.getElementById("gameOver");
 
-    let score = 0;
-    let poopCount = 0;
-    let isGameOver = false;
-    let speed = 2;
-    let dropInterval;
-
-    const fruits = ["🍎", "🍌", "🍊", "🍓", "🍉", "🍇", "🍍", "🍒"];
+    const fruits = ["🍎","🍌","🍊","🍓","🍉","🍇","🍍","🍒"];
     const poop = "💩";
-
-    document.addEventListener("keydown", (e) => {
-      if (isGameOver) return;
-      const left = basket.offsetLeft;
-      if (e.key === "ArrowLeft" && left > 10) {
-        basket.style.left = left - 30 + "px";
-      } else if (e.key === "ArrowRight" && left < window.innerWidth - basket.offsetWidth - 10) {
-        basket.style.left = left + 30 + "px";
-      }
-    });
-
-    let touchStartX = null;
-    game.addEventListener("touchstart", (e) => {
-      if (e.touches.length === 1) {
-        touchStartX = e.touches[0].clientX;
-      }
-    });
-    game.addEventListener("touchmove", (e) => {
-      if (touchStartX !== null) {
-        const touchX = e.touches[0].clientX;
-        const diff = touchX - touchStartX;
-        const basketLeft = basket.offsetLeft + diff;
-        if (basketLeft >= 0 && basketLeft <= window.innerWidth - basket.offsetWidth) {
-          basket.style.left = basketLeft + "px";
-        }
-        touchStartX = touchX;
-      }
-    });
-    game.addEventListener("touchend", () => {
-      touchStartX = null;
-    });
+    let score=0, poopCount=0, speed=2, isGameOver=false, dropInterval, touchX=null;
 
     function dropItem() {
       if (isGameOver) return;
       const item = document.createElement("div");
-      item.classList.add("falling");
-      item.innerText = Math.random() < 0.2 ? poop : fruits[Math.floor(Math.random() * fruits.length)];
-      item.style.left = Math.random() * (window.innerWidth - 40) + "px";
-      item.style.top = "-40px";
+      item.className="falling";
+      item.innerText = Math.random()<0.2 ? poop : fruits[Math.floor(Math.random()*fruits.length)];
+      item.style.left=Math.random()*(window.innerWidth-40)+"px";
+      item.style.top="-40px";
       game.appendChild(item);
 
       const fall = setInterval(() => {
-        if (isGameOver) {
-          clearInterval(fall);
-          item.remove();
-          return;
-        }
+        if (isGameOver) { clearInterval(fall); item.remove(); return; }
+        const top = item.offsetTop;
+        const left = item.offsetLeft;
+        const itemSize = 40;
 
-        const itemTop = item.offsetTop;
-        const itemLeft = item.offsetLeft;
-        const basketLeft = basket.offsetLeft;
+        const basketRect = basket.getBoundingClientRect();
+        const itemCenterX = left + itemSize / 2;
+        const itemBottom = top + itemSize;
+
+        // Collision detection (fruit falls into basket)
         const basketTop = basket.offsetTop;
+        const basketLeft = basket.offsetLeft;
+        const basketRight = basketLeft + basket.offsetWidth;
 
-        // Check for catch
-        if (itemTop + 40 >= basketTop && itemTop + 40 <= basketTop + 20) {
-          if (itemLeft + 20 > basketLeft && itemLeft < basketLeft + basket.offsetWidth) {
-            if (item.innerText === poop) {
-              poopCount++;
-              poopDisplay.innerText = poopCount;
-              if (poopCount >= 3) {
-                endGame();
-              }
-            } else {
-              score++;
-              scoreBoard.innerText = "Score: " + score;
-              if (score % 10 === 0) speed += 0.5;
-            }
-            item.remove();
-            clearInterval(fall);
-            return;
+        const isCatch = itemBottom >= basketTop &&
+                        itemCenterX >= basketLeft &&
+                        itemCenterX <= basketRight;
+
+        if (isCatch) {
+          if (item.innerText === poop) {
+            poopCount++;
+            poopDisplay.innerText = poopCount;
+            if (poopCount >= 3) endGame();
+          } else {
+            score++;
+            scoreBoard.innerText = "Score: " + score;
+            if (score % 10 === 0) speed += 0.5;
           }
-        }
-
-        // If item fell below screen, remove it
-        if (itemTop > window.innerHeight) {
           item.remove();
           clearInterval(fall);
           return;
         }
 
-        // keep falling
-        item.style.top = itemTop + speed + "px";
+        if (top > window.innerHeight) {
+          item.remove();
+          clearInterval(fall);
+          return;
+        }
+
+        item.style.top = top + speed + "px";
       }, 20);
     }
 
@@ -193,11 +108,11 @@
       document.querySelectorAll(".falling").forEach(e => e.remove());
       score = 0;
       poopCount = 0;
-      isGameOver = false;
       speed = 2;
+      isGameOver = false;
       scoreBoard.innerText = "Score: 0";
       poopDisplay.innerText = "0";
-      gameOverText.style.display = "none";
+      gameOver.style.display = "none";
       playBtn.style.display = "none";
       dropInterval = setInterval(dropItem, 800);
     }
@@ -205,12 +120,42 @@
     function endGame() {
       isGameOver = true;
       clearInterval(dropInterval);
-      gameOverText.style.display = "block";
+      gameOver.style.display = "block";
       playBtn.innerText = "🔁 Play Again";
       playBtn.style.display = "block";
     }
 
-    playBtn.onclick = startGame;
+    document.addEventListener("keydown", e => {
+      if (isGameOver) return;
+      const moveAmount = 30;
+      let currentLeft = basket.offsetLeft;
+
+      if (e.key === "ArrowLeft") {
+        currentLeft -= moveAmount;
+      } else if (e.key === "ArrowRight") {
+        currentLeft += moveAmount;
+      }
+
+      // Clamp to screen width
+      currentLeft = Math.max(0, Math.min(currentLeft, window.innerWidth - basket.offsetWidth));
+      basket.style.left = currentLeft + "px";
+    });
+
+    game.addEventListener("touchstart", e => {
+      if (e.touches.length > 0) touchX = e.touches[0].clientX;
+    });
+    game.addEventListener("touchmove", e => {
+      if (touchX != null) {
+        const dx = e.touches[0].clientX - touchX;
+        let newX = basket.offsetLeft + dx;
+        newX = Math.max(0, Math.min(newX, window.innerWidth - basket.offsetWidth));
+        basket.style.left = newX + "px";
+        touchX = e.touches[0].clientX;
+      }
+    });
+    game.addEventListener("touchend", () => touchX = null);
+
+    playBtn.addEventListener("click", startGame);
   </script>
 </body>
 </html>
