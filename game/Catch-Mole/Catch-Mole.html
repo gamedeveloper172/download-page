@@ -1,1 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Whack-a-Mole</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #game {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .hole {
+      width: 100px;
+      height: 100px;
+      background: #444;
+      border-radius: 50%;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: white;
+      transition: background 0.2s;
+    }
+
+    .mole {
+      background: #e74c3c;
+    }
+
+    .miss {
+      background: #888;
+    }
+
+    #scoreboard {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <h1>🕳️ Whack-a-Mole!</h1>
+  <div id="scoreboard">
+    ⏱️ Time: <span id="time">30</span> sec &nbsp; | &nbsp; 🎯 Score: <span id="score">0</span>
+  </div>
+  <div id="game"></div>
+
+  <script>
+    const game = document.getElementById('game');
+    const scoreDisplay = document.getElementById('score');
+    const timeDisplay = document.getElementById('time');
+
+    let score = 0;
+    let time = 30;
+    let moleIndex = -1;
+    let gameInterval;
+    let moleInterval;
+
+    // Create holes
+    for (let i = 0; i < 9; i++) {
+      const hole = document.createElement('div');
+      hole.classList.add('hole');
+      hole.dataset.index = i;
+      game.appendChild(hole);
+    }
+
+    const holes = document.querySelectorAll('.hole');
+
+    function showMole() {
+      holes.forEach(hole => {
+        hole.classList.remove('mole', 'miss');
+        hole.textContent = '';
+      });
+      moleIndex = Math.floor(Math.random() * 9);
+      holes[moleIndex].classList.add('mole');
+      holes[moleIndex].textContent = '🐹';
+    }
+
+    function startGame() {
+      moleInterval = setInterval(showMole, 1000);
+
+      gameInterval = setInterval(() => {
+        time--;
+        timeDisplay.textContent = time;
+        if (time <= 0) {
+          clearInterval(moleInterval);
+          clearInterval(gameInterval);
+          holes.forEach(h => {
+            h.classList.remove('mole');
+            h.textContent = '';
+            h.style.pointerEvents = 'none';
+          });
+          alert('⏰ Time is up! Final Score: ' + score);
+        }
+      }, 1000);
+    }
+
+    holes.forEach(hole => {
+      hole.addEventListener('click', () => {
+        const index = Number(hole.dataset.index);
+        if (index === moleIndex) {
+          score++;
+          scoreDisplay.textContent = score;
+          hole.classList.remove('mole');
+          hole.textContent = '';
+          moleIndex = -1;
+        } else {
+          // Show ❌ briefly on wrong tap
+          hole.classList.add('miss');
+          hole.textContent = '❌';
+          setTimeout(() => {
+            hole.classList.remove('miss');
+            hole.textContent = '';
+          }, 500);
+        }
+      });
+    });
+
+    // Start the game
+    startGame();
+  </script>
+</body>
+</html>
 
