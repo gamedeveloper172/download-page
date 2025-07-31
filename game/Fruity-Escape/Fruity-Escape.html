@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🍌 Fruit Catcher Game</title>
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
+    * { box-sizing: border-box; padding: 0; margin: 0; }
+    html, body {
+      height: 100%;
       font-family: Arial, sans-serif;
       background: #e0f7fa;
       overflow: hidden;
@@ -19,16 +19,18 @@
       touch-action: none;
     }
     #basket {
-      width: 12vw;
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18vw;
       max-width: 100px;
+      height: auto;
       aspect-ratio: 1.5 / 1;
       background-image: url('https://cdn-icons-png.flaticon.com/512/3660/3660037.png');
       background-size: contain;
       background-repeat: no-repeat;
-      position: absolute;
-      bottom: 3%;
-      left: 44%;
-      transition: left 0.1s linear;
+      background-position: center;
     }
     .item {
       position: absolute;
@@ -36,33 +38,39 @@
       max-width: 40px;
       font-size: 6vw;
       text-align: center;
+      z-index: 1;
     }
     #score, #lives {
       position: absolute;
       top: 10px;
-      font-size: 1.3em;
+      font-size: 1.2em;
       font-weight: bold;
       color: #333;
+      z-index: 2;
     }
     #score { left: 15px; }
     #lives { right: 15px; color: red; }
+
     #overlay {
       position: absolute;
       width: 100%;
       height: 100%;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.95);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 999;
       text-align: center;
+      padding: 20px;
     }
+
     #overlay h1 {
       font-size: 2em;
       margin-bottom: 20px;
       color: #ff4081;
     }
+
     #playBtn, #replayBtn {
       padding: 12px 30px;
       font-size: 1.2em;
@@ -72,7 +80,9 @@
       color: white;
       border-radius: 8px;
       transition: 0.3s;
+      margin-top: 10px;
     }
+
     #playBtn:hover, #replayBtn:hover {
       background-color: #0097a7;
     }
