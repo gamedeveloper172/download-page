@@ -44,7 +44,7 @@
     }
     #basket {
       position: absolute;
-      bottom: 50px; /* ✅ updated */
+      bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
       width: 80px;
@@ -151,12 +151,14 @@
           item.remove();
           return;
         }
+
         const itemTop = item.offsetTop;
         const itemLeft = item.offsetLeft;
         const basketLeft = basket.offsetLeft;
         const basketTop = basket.offsetTop;
 
-        if (itemTop > window.innerHeight - 120) {
+        // Check for catch
+        if (itemTop + 40 >= basketTop && itemTop + 40 <= basketTop + 20) {
           if (itemLeft + 20 > basketLeft && itemLeft < basketLeft + basket.offsetWidth) {
             if (item.innerText === poop) {
               poopCount++;
@@ -171,13 +173,19 @@
             }
             item.remove();
             clearInterval(fall);
-          } else if (itemTop > window.innerHeight - 20) {
-            item.remove();
-            clearInterval(fall);
+            return;
           }
-        } else {
-          item.style.top = itemTop + speed + "px";
         }
+
+        // If item fell below screen, remove it
+        if (itemTop > window.innerHeight) {
+          item.remove();
+          clearInterval(fall);
+          return;
+        }
+
+        // keep falling
+        item.style.top = itemTop + speed + "px";
       }, 20);
     }
 
