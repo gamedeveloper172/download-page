@@ -18,7 +18,7 @@
       user-select:none;
     }
     #basket {
-      position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+      position:absolute; bottom:100px; left:50%; transform:translateX(-50%);
       width:90px; height:auto; z-index:3; user-select:none;
       transition:left 0.05s linear;
     }
@@ -49,7 +49,8 @@
 
     const fruits = ["🍎","🍌","🍊","🍓","🍉","🍇","🍍","🍒"];
     const poop = "💩";
-    let score=0, poopCount=0, speed=2, isGameOver=false, dropInterval, touchX=null;
+    let score=0, poopCount=0, speed=2, isGameOver=false, dropInterval;
+    let dragOffsetX = null;
 
     function dropItem() {
       if (isGameOver) return;
@@ -66,14 +67,11 @@
         const left = item.offsetLeft;
         const itemSize = 40;
 
-        const basketRect = basket.getBoundingClientRect();
-        const itemCenterX = left + itemSize / 2;
-        const itemBottom = top + itemSize;
-
-        // Collision detection (fruit falls into basket)
         const basketTop = basket.offsetTop;
         const basketLeft = basket.offsetLeft;
         const basketRight = basketLeft + basket.offsetWidth;
+        const itemCenterX = left + itemSize / 2;
+        const itemBottom = top + itemSize;
 
         const isCatch = itemBottom >= basketTop &&
                         itemCenterX >= basketLeft &&
@@ -136,24 +134,39 @@
         currentLeft += moveAmount;
       }
 
-      // Clamp to screen width
       currentLeft = Math.max(0, Math.min(currentLeft, window.innerWidth - basket.offsetWidth));
       basket.style.left = currentLeft + "px";
     });
 
+    // --- Updated touch code for drag-on-basket only ---
     game.addEventListener("touchstart", e => {
-      if (e.touches.length > 0) touchX = e.touches[0].clientX;
-    });
-    game.addEventListener("touchmove", e => {
-      if (touchX != null) {
-        const dx = e.touches[0].clientX - touchX;
-        let newX = basket.offsetLeft + dx;
-        newX = Math.max(0, Math.min(newX, window.innerWidth - basket.offsetWidth));
-        basket.style.left = newX + "px";
-        touchX = e.touches[0].clientX;
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        const basketRect = basket.getBoundingClientRect();
+
+        if (
+          touch.clientY >= basketRect.top &&
+          touch.clientY <= basketRect.bottom &&
+          touch.clientX >= basketRect.left &&
+          touch.clientX <= basketRect.right
+        ) {
+          dragOffsetX = touch.clientX - basket.offsetLeft;
+        }
       }
     });
-    game.addEventListener("touchend", () => touchX = null);
+
+    game.addEventListener("touchmove", e => {
+      if (dragOffsetX != null && e.touches.length > 0) {
+        const touchX = e.touches[0].clientX;
+        let newLeft = touchX - dragOffsetX;
+        newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - basket.offsetWidth));
+        basket.style.left = newLeft + "px";
+      }
+    });
+
+    game.addEventListener("touchend", () => {
+      dragOffsetX = null;
+    });
 
     playBtn.addEventListener("click", startGame);
   </script>
