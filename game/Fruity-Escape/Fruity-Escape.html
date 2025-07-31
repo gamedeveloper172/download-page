@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🍌 Fruit Catcher Game</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e0f7fa;
+      overflow: hidden;
+    }
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+    }
+    #basket {
+      width: 12vw;
+      max-width: 100px;
+      aspect-ratio: 1.5 / 1;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/3660/3660037.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      position: absolute;
+      bottom: 3%;
+      left: 44%;
+      transition: left 0.1s linear;
+    }
+    .item {
+      position: absolute;
+      width: 8vw;
+      max-width: 40px;
+      font-size: 6vw;
+      text-align: center;
+    }
+    #score, #lives {
+      position: absolute;
+      top: 10px;
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #333;
+    }
+    #score { left: 15px; }
+    #lives { right: 15px; color: red; }
+    #overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      text-align: center;
+    }
+    #overlay h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #ff4081;
+    }
+    #playBtn, #replayBtn {
+      padding: 12px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      border: none;
+      background-color: #00bcd4;
+      color: white;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    #playBtn:hover, #replayBtn:hover {
+      background-color: #0097a7;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="score">Score: 0</div>
+    <div id="lives">💩 x 0</div>
+    <div id="basket"></div>
+
+    <div id="overlay">
+      <h1>🍌 Catch Fruits, Avoid 💩</h1>
+      <button id="playBtn">▶️ Play Game</button>
+    </div>
+  </div>
+
+  <script>
+    const game = document.getElementById("game");
+    const basket = document.getElementById("basket");
+    const scoreEl = document.getElementById("score");
+    const livesEl = document.getElementById("lives");
+    const overlay = document.getElementById("overlay");
+    const playBtn = document.getElementById("playBtn");
+
+    let basketX;
+    let score = 0;
+    let lives = 0;
+    let gameRunning = false;
+    let speed = 2.5;
+    let intervalId;
+
+    const fruits = ["🍌", "🥭", "🍎", "🍫"];
+    const poop = "💩";
+
+    function updateBasketPosition() {
+      basket.style.left = basketX + "px";
+    }
+
+    function startGame() {
+      overlay.style.display = "none";
+      basketX = window.innerWidth / 2 - basket.offsetWidth / 2;
+      updateBasketPosition();
+      score = 0;
+      lives = 0;
+      speed = 2.5;
+      gameRunning = true;
+      scoreEl.innerText = "Score: 0";
+      livesEl.innerText = "💩 x 0";
+
+      intervalId = setInterval(() => {
+        if (gameRunning) spawnItem();
+        if (speed < 8) speed += 0.01;
+      }, 800);
+    }
+
+    function spawnItem() {
+      const item = document.createElement("div");
+      item.classList.add("item");
+      const isFruit = Math.random() > 0.25;
+      item.innerText = isFruit ? fruits[Math.floor(Math.random() * fruits.length)] : poop;
+      item.dataset.type = isFruit ? "fruit" : "poop";
+      item.style.left = Math.random() * (window.innerWidth - 40) + "px";
+      item.style.top = "0px";
+      game.appendChild(item);
+
+      let itemY = 0;
+      const fall = setInterval(() => {
+        if (!gameRunning) {
+          clearInterval(fall);
+          return;
+        }
+        itemY += speed;
+        item.style.top = itemY + "px";
+
+        const itemX = parseFloat(item.style.left);
+        const basketRect = basket.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+
+        const caught = (
+          itemY + item.offsetHeight >= basketRect.top &&
+          itemX + item.offsetWidth >= basketRect.left &&
+          itemX <= basketRect.right
+        );
+
+        if (caught) {
+          if (item.dataset.type === "fruit") {
+            score++;
+            scoreEl.innerText = "Score: " + score;
+          } else {
+            lives++;
+            livesEl.innerText = "💩 x " + lives;
+            if (lives >= 3) endGame();
+          }
+          clearInterval(fall);
+          item.remove();
+        } else if (itemY > window.innerHeight) {
+          clearInterval(fall);
+          item.remove();
+        }
+      }, 20);
+    }
+
+    function endGame() {
+      gameRunning = false;
+      clearInterval(intervalId);
+      overlay.innerHTML = `
+        <h1>😵 Game Over!</h1>
+        <p>Score: ${score}</p>
+        <button id="replayBtn">🔁 Play Again</button>
+      `;
+      overlay.style.display = "flex";
+      document.getElementById("replayBtn").onclick = startGame;
+    }
+
+    // Keyboard control
+    document.addEventListener("keydown", (e) => {
+      if (!gameRunning) return;
+      const moveAmount = window.innerWidth * 0.05;
+      if (e.key === "ArrowLeft") basketX -= moveAmount;
+      if (e.key === "ArrowRight") basketX += moveAmount;
+      basketX = Math.max(0, Math.min(window.innerWidth - basket.offsetWidth, basketX));
+      updateBasketPosition();
+    });
+
+    // Touch swipe control
+    let touchStartX = null;
+    game.addEventListener("touchstart", (e) => {
+      if (!gameRunning) return;
+      touchStartX = e.touches[0].clientX;
+    });
+
+    game.addEventListener("touchmove", (e) => {
+      if (!gameRunning || touchStartX === null) return;
+      const touchX = e.touches[0].clientX;
+      const deltaX = touchX - touchStartX;
+      basketX += deltaX;
+      basketX = Math.max(0, Math.min(window.innerWidth - basket.offsetWidth, basketX));
+      updateBasketPosition();
+      touchStartX = touchX;
+    });
+
+    playBtn.onclick = startGame;
+  </script>
+</body>
+</html>
