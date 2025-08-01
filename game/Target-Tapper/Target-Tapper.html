@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Target Tapper</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle, #111 0%, #333 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 28px;
+      color: #0f0;
+    }
+    #scoreboard {
+      margin: 10px;
+      font-size: 18px;
+    }
+    #gameArea {
+      position: relative;
+      width: 90vw;
+      max-width: 400px;
+      height: 500px;
+      background: #000;
+      border: 3px solid #0f0;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .target {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: red;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .target:active {
+      transform: scale(0.9);
+    }
+    #startBtn {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 Target Tapper</h1>
+  <div id="scoreboard">Score: 0 | Time: 30s</div>
+  <div id="gameArea"></div>
+  <button id="startBtn">Start Game</button>
+
+  <audio id="hitSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+  <audio id="missSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"></audio>
+
+  <script>
+    const gameArea = document.getElementById('gameArea');
+    const scoreDisplay = document.getElementById('scoreboard');
+    const startBtn = document.getElementById('startBtn');
+    const hitSound = document.getElementById('hitSound');
+    const missSound = document.getElementById('missSound');
+
+    let score = 0;
+    let timeLeft = 30;
+    let gameInterval;
+    let spawnInterval;
+
+    function getRandomPosition() {
+      const maxX = gameArea.clientWidth - 40;
+      const maxY = gameArea.clientHeight - 40;
+      const x = Math.floor(Math.random() * maxX);
+      const y = Math.floor(Math.random() * maxY);
+      return { x, y };
+    }
+
+    function createTarget() {
+      const target = document.createElement('div');
+      target.classList.add('target');
+      const pos = getRandomPosition();
+      target.style.left = `${pos.x}px`;
+      target.style.top = `${pos.y}px`;
+
+      target.addEventListener('click', () => {
+        score++;
+        hitSound.currentTime = 0;
+        hitSound.play();
+        target.remove();
+        updateScoreboard();
+      });
+
+      gameArea.appendChild(target);
+      setTimeout(() => {
+        if (gameArea.contains(target)) {
+          target.remove();
+          missSound.currentTime = 0;
+          missSound.play();
+        }
+      }, 1000);
+    }
+
+    function updateScoreboard() {
+      scoreDisplay.textContent = `Score: ${score} | Time: ${timeLeft}s`;
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      gameArea.innerHTML = '';
+      updateScoreboard();
+      startBtn.disabled = true;
+
+      spawnInterval = setInterval(createTarget, 700);
+      gameInterval = setInterval(() => {
+        timeLeft--;
+        updateScoreboard();
+        if (timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      clearInterval(spawnInterval);
+      clearInterval(gameInterval);
+      alert(`⏰ Time's up! Your score: ${score}`);
+      startBtn.disabled = false;
+    }
+
+    startBtn.addEventListener('click', startGame);
+  </script>
+</body>
+</html>
