@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reaction Speed Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #111;
+      color: white;
+      text-align: center;
+    }
+    #box {
+      height: 300px;
+      background: #444;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      cursor: pointer;
+    }
+    button {
+      margin: 20px;
+      padding: 12px 24px;
+      font-size: 18px;
+      background: #0f0;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #result {
+      font-size: 24px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>⏱ Reaction Speed</h1>
+  <button onclick="startGame()">Start</button>
+  <div id="box">Click Start to Begin</div>
+  <p id="result"></p>
+
+  <audio id="win" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="fail" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+  <script>
+    let startTime;
+    const box = document.getElementById("box");
+    const result = document.getElementById("result");
+    const win = document.getElementById("win");
+    const fail = document.getElementById("fail");
+
+    function startGame() {
+      result.textContent = "";
+      box.style.background = "#444";
+      box.textContent = "Wait for Green...";
+      let delay = Math.random() * 3000 + 2000;
+      setTimeout(() => {
+        box.style.background = "green";
+        box.textContent = "TAP!";
+        startTime = new Date().getTime();
+        box.onclick = winReaction;
+      }, delay);
+      box.onclick = failReaction;
+    }
+
+    function winReaction() {
+      let reaction = new Date().getTime() - startTime;
+      box.textContent = `⏱ ${reaction}ms`;
+      win.play();
+      box.onclick = null;
+    }
+
+    function failReaction() {
+      fail.play();
+      box.textContent = "Too Early!";
+      box.onclick = null;
+    }
+  </script>
+</body>
+</html>
