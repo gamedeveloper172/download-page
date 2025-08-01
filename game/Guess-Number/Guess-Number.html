@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Number Guessing</title>
+<style>
+ body{font-family:sans-serif;display:flex;align-items:center;flex-direction:column;height:100vh;margin:0;background:#eee;}
+ input,button{padding:10px;margin:5px;font-size:16px;}
+ button{cursor:pointer;}
+#status{margin-top:10px;}
+</style></head><body>
+<h1>Guess the Number</h1>
+<input type="number" id="guess" placeholder="1 to 100"/>
+<button id="startBtn">Start Game</button>
+<button id="checkBtn" disabled>Check Guess</button>
+<div id="status">Press Start to begin!</div>
+<script>
+let secret,attempts;const status=document.getElementById('status'),
+startBtn=document.getElementById('startBtn'),
+checkBtn=document.getElementById('checkBtn'),
+guessInput=document.getElementById('guess');
+const correctSound=new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
+tooHigh=new Audio('https://actions.google.com/sounds/v1/cartoon/boing.ogg'),
+tooLow=new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_trombone_doh.ogg');
+function startGame(){
+ secret=Math.floor(Math.random()*100)+1;attempts=0;
+ status.textContent='Game started! Make a guess.';
+ startBtn.disabled=true;checkBtn.disabled=false;
+ guessInput.value='';
+}
+function checkGuess(){
+ let g=Number(guessInput.value);attempts++;
+ if(g===secret){
+   status.textContent=`🎉 Correct! It was ${secret}. Attempts: ${attempts}`;
+   correctSound.play();
+   startBtn.disabled=false;checkBtn.disabled=true;
+ } else if(g>secret){
+   status.textContent='Too high! Try again.';
+   tooHigh.play();
+ } else{
+   status.textContent='Too low! Try again.';
+   tooLow.play();
+ }
+}
+startBtn.onclick=startGame;
+checkBtn.onclick=checkGuess;
+</script></body></html>
