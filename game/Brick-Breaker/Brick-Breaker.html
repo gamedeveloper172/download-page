@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brick Breaker Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 2px solid #00ffcc;
+      margin-top: 20px;
+      display: none;
+    }
+    #message {
+      font-size: 24px;
+      margin-top: 20px;
+      color: #00ffcc;
+      display: none;
+    }
+    #startBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #00cc99;
+      color: #fff;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    #startBtn:hover {
+      background: #00a67a;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧱 Brick Breaker</h1>
+  <button id="startBtn">Start Game</button>
+  <canvas id="gameCanvas" width="480" height="320"></canvas>
+  <div id="message"></div>
+
+  <audio id="hitSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+  <audio id="winSound" src="https://actions.google.com/sounds/v1/cartoon/concussive_drum_hit.ogg"></audio>
+  <audio id="loseSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const startBtn = document.getElementById("startBtn");
+    const message = document.getElementById("message");
+    const hitSound = document.getElementById("hitSound");
+    const winSound = document.getElementById("winSound");
+    const loseSound = document.getElementById("loseSound");
+
+    let interval;
+
+    // Game variables
+    let ballX, ballY, ballDX, ballDY, paddleX, rightPressed, leftPressed;
+    const ballRadius = 8;
+    const paddleHeight = 10;
+    const paddleWidth = 75;
+
+    const brickRowCount = 3;
+    const brickColumnCount = 5;
+    const brickWidth = 75;
+    const brickHeight = 20;
+    const brickPadding = 10;
+    const brickOffsetTop = 30;
+    const brickOffsetLeft = 35;
+
+    let bricks = [];
+
+    function resetGame() {
+      canvas.style.display = "block";
+      message.style.display = "none";
+      bricks = [];
+      for (let c = 0; c < brickColumnCount; c++) {
+        bricks[c] = [];
+        for (let r = 0; r < brickRowCount; r++) {
+          bricks[c][r] = { x: 0, y: 0, status: 1 };
+        }
+      }
+
+      ballX = canvas.width / 2;
+      ballY = canvas.height - 30;
+      ballDX = 2;
+      ballDY = -2;
+      paddleX = (canvas.width - paddleWidth) / 2;
+      rightPressed = false;
+      leftPressed = false;
+
+      document.addEventListener("keydown", keyDownHandler);
+      document.addEventListener("keyup", keyUpHandler);
+
+      clearInterval(interval);
+      interval = setInterval(draw, 10);
+    }
+
+    startBtn.addEventListener("click", () => {
+      resetGame();
+    });
+
+    function keyDownHandler(e) {
+      if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
+      else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
+    }
+
+    function keyUpHandler(e) {
+      if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
+      else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+      ctx.fillStyle = "#00ffcc";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawPaddle() {
+      ctx.beginPath();
+      ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+      ctx.fillStyle = "#00ffcc";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawBricks() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          if (bricks[c][r].status === 1) {
+            const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+            const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+            bricks[c][r].x = brickX;
+            bricks[c][r].y = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "#ff3366";
+            ctx.fill();
+            ctx.closePath();
+          }
+        }
+      }
+    }
+
+    function collisionDetection() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          let b = bricks[c][r];
+          if (b.status === 1) {
+            if (
+              ballX > b.x &&
+              ballX < b.x + brickWidth &&
+              ballY > b.y &&
+              ballY < b.y + brickHeight
+            ) {
+              ballDY = -ballDY;
+              b.status = 0;
+              hitSound.play();
+              if (checkWin()) {
+                message.textContent = "🎉 You Win!";
+                message.style.display = "block";
+                winSound.play();
+                clearInterval(interval);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    function checkWin() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          if (bricks[c][r].status === 1) return false;
+        }
+      }
+      return true;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBricks();
+      drawBall();
+      drawPaddle();
+      collisionDetection();
+
+      if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
+        ballDX = -ballDX;
+        hitSound.play();
+      }
+
+      if (ballY + ballDY < ballRadius) {
+        ballDY = -ballDY;
+        hitSound.play();
+      } else if (ballY + ballDY > canvas.height - ballRadius) {
+        if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+          ballDY = -ballDY;
+          hitSound.play();
+        } else {
+          message.textContent = "💥 You Lose!";
+          message.style.display = "block";
+          loseSound.play();
+          clearInterval(interval);
+        }
+      }
+
+      ballX += ballDX;
+      ballY += ballDY;
+
+      if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 5;
+      else if (leftPressed && paddleX > 0) paddleX -= 5;
+    }
+  </script>
+</body>
+</html>
