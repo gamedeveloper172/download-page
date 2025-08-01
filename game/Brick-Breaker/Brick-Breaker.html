@@ -17,7 +17,7 @@
     canvas {
       border: 2px solid #00ffcc;
       margin-top: 20px;
-      display: none;
+      background: #000;
     }
     #message {
       font-size: 24px;
@@ -34,10 +34,23 @@
       font-size: 18px;
       cursor: pointer;
       border-radius: 8px;
-      transition: 0.3s;
     }
-    #startBtn:hover {
-      background: #00a67a;
+    #controls {
+      display: flex;
+      justify-content: space-around;
+      width: 200px;
+      margin-top: 20px;
+    }
+    .control-btn {
+      width: 80px;
+      height: 50px;
+      background: #00cc99;
+      color: white;
+      border: none;
+      font-size: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
     }
   </style>
 </head>
@@ -46,6 +59,11 @@
   <button id="startBtn">Start Game</button>
   <canvas id="gameCanvas" width="480" height="320"></canvas>
   <div id="message"></div>
+
+  <div id="controls">
+    <button class="control-btn" id="leftBtn">⬅️</button>
+    <button class="control-btn" id="rightBtn">➡️</button>
+  </div>
 
   <audio id="hitSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
   <audio id="winSound" src="https://actions.google.com/sounds/v1/cartoon/concussive_drum_hit.ogg"></audio>
@@ -56,6 +74,10 @@
     const ctx = canvas.getContext("2d");
     const startBtn = document.getElementById("startBtn");
     const message = document.getElementById("message");
+
+    const leftBtn = document.getElementById("leftBtn");
+    const rightBtn = document.getElementById("rightBtn");
+
     const hitSound = document.getElementById("hitSound");
     const winSound = document.getElementById("winSound");
     const loseSound = document.getElementById("loseSound");
@@ -97,9 +119,6 @@
       rightPressed = false;
       leftPressed = false;
 
-      document.addEventListener("keydown", keyDownHandler);
-      document.addEventListener("keyup", keyUpHandler);
-
       clearInterval(interval);
       interval = setInterval(draw, 10);
     }
@@ -108,15 +127,20 @@
       resetGame();
     });
 
-    function keyDownHandler(e) {
-      if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
-      else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
-    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") rightPressed = true;
+      else if (e.key === "ArrowLeft") leftPressed = true;
+    });
+    document.addEventListener("keyup", (e) => {
+      if (e.key === "ArrowRight") rightPressed = false;
+      else if (e.key === "ArrowLeft") leftPressed = false;
+    });
 
-    function keyUpHandler(e) {
-      if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
-      else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
-    }
+    // Mobile controls
+    leftBtn.addEventListener("touchstart", () => (leftPressed = true));
+    leftBtn.addEventListener("touchend", () => (leftPressed = false));
+    rightBtn.addEventListener("touchstart", () => (rightPressed = true));
+    rightBtn.addEventListener("touchend", () => (rightPressed = false));
 
     function drawBall() {
       ctx.beginPath();
@@ -155,7 +179,7 @@
     function collisionDetection() {
       for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
-          let b = bricks[c][r];
+          const b = bricks[c][r];
           if (b.status === 1) {
             if (
               ballX > b.x &&
