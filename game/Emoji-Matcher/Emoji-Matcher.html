@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Emoji Memory Match</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      display: flex; justify-content: center; align-items: center;
+      flex-direction: column;
+      font-family: 'Segoe UI', sans-serif;
+      background: #282c34; color: white;
+      height:100vh;
+      user-select:none;
+    }
+    h1 { margin-bottom: 10px; color:#61dafb; }
+    #controls {
+      margin-bottom:20px;
+      display:flex; gap:16px;
+      align-items:center;
+    }
+    button {
+      background:#61dafb; color:#282c34;
+      border:none; cursor:pointer;
+      padding:10px 20px; font-size:16px;
+      border-radius:8px;
+      transition:transform 0.2s, background 0.3s;
+    }
+    button:hover { transform:scale(1.05); background:#21a1f1; }
+    #status { font-size:18px; }
+    #board {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap:10px;
+      width:90vw; max-width:400px;
+    }
+    .card {
+      background:#444;
+      border-radius:12px;
+      font-size:2rem;
+      height:80px; display:flex;
+      justify-content:center; align-items:center;
+      cursor:pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.4s;
+      position: relative;
+    }
+    .card.flipped { transform: rotateY(180deg); }
+    .card .front, .card .back {
+      position:absolute; width:100%; height:100%;
+      display:flex; justify-content:center; align-items:center;
+      backface-visibility:hidden;
+      border-radius:12px;
+    }
+    .card .front {
+      background:#eee; color:#444;
+      transform: rotateY(180deg);
+    }
+    .card .back { background:#61dafb; font-size:1.5rem; }
+    @media (max-width:400px) {
+      .card { height:60px; font-size:1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Emoji Memory Match</h1>
+  <div id="controls">
+    <button id="startBtn">Start Game</button>
+    <div id="status">Moves: 0 | Time: 0s</div>
+  </div>
+  <div id="board"></div>
+
+  <audio id="matchSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="mismatchSound" src="https://actions.google.com/sounds/v1/cartoon/boing.ogg"></audio>
+  <audio id="winSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+
+  <script>
+    const emojis = ['😀','🎉','🚀','🐶','🌟','🍕','❤️','🎮'];
+    let boardEl = document.getElementById('board');
+    let statusEl = document.getElementById('status');
+    let startBtn = document.getElementById('startBtn');
+    let matchSound = document.getElementById('matchSound');
+    let mismatchSound = document.getElementById('mismatchSound');
+    let winSound = document.getElementById('winSound');
+
+    let cards = [], first=null, second=null;
+    let moves=0, timer=0, matches=0, total=emojis.length;
+    let interval;
+
+    function shuffle(a){ return a.sort(()=> Math.random()-0.5); }
+
+    function createBoard(){
+      boardEl.innerHTML='';
+      let items = shuffle([...emojis, ...emojis]);
+      cards = items.map((emoji,i)=> {
+        let card = document.createElement('div');
+        card.className='card';
+        card.dataset.emoji = emoji;
+        card.innerHTML = `
+          <div class="front">${emoji}</div>
+          <div class="back">❓</div>`;
+        card.addEventListener('click', () => flipCard(card));
+        return card;
+      });
+      cards.forEach(c=>boardEl.appendChild(c));
+    }
+
+    function flipCard(card){
+      if(!gameOn || card===first || card.classList.contains('flipped')) return;
+      card.classList.add('flipped');
+      if(!first) first=card;
+      else {
+        second=card;
+        moves++; updateStatus();
+        if(first.dataset.emoji===second.dataset.emoji){
+          matches++;
+          matchSound.play();
+          first=second=null;
+          if(matches===total){ endGame(); }
+        } else {
+          mismatchSound.play();
+          setTimeout(()=>{
+            first.classList.remove('flipped');
+            second.classList.remove('flipped');
+            first=second=null;
+          },600);
+        }
+      }
+    }
+
+    function updateStatus(){ statusEl.textContent=`Moves: ${moves} | Time: ${timer}s`; }
+
+    function startTimer(){ interval = setInterval(()=>{timer++; updateStatus();},1000); }
+    function endGame(){
+      clearInterval(interval);
+      winSound.play();
+      setTimeout(()=> alert(`🎉 You won in ${moves} moves and ${timer}s!`),200);
+      gameOn=false;
+      startBtn.disabled=false;
+    }
+
+    let gameOn=false;
+    startBtn.onclick = () => {
+      moves=0; timer=0; matches=0;
+      updateStatus();
+      createBoard();
+      startBtn.disabled = true;
+      gameOn=true;
+      clearInterval(interval);
+      startTimer();
+    };
+  </script>
+</body>
+</html>
