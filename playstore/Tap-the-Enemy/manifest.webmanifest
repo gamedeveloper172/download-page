@@ -1,0 +1,21 @@
+{
+  "name": "Tap the Enemy",
+  "short_name": "TapEnemy",
+  "start_url": "/game/Tap-the-Enemy/Tap-the-Enemy.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0aa14f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/image/enemy.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/image/enemy.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
