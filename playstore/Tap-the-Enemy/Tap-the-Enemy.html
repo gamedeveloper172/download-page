@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tap the Enemy - Game Hub</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #f2f4f7;
+  color: #1e1e1e;
+}
+
+.app-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 25px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.app-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.app-info h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #333;
+}
+
+.company {
+  color: #0077cc;
+  font-weight: 600;
+}
+
+.meta, .details span {
+  color: #777;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.install-btn {
+  margin-top: 12px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #0b9d58, #0aa14f);
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+.install-btn:hover {
+  background: linear-gradient(135deg, #0aa14f, #098d47);
+  transform: translateY(-2px);
+}
+
+.availability {
+  color: #666;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.screenshots {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.screenshots img {
+  width: 30%;
+  min-width: 100px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.screenshots img:hover {
+  transform: scale(1.05);
+}
+
+.section {
+  margin: 30px 0;
+}
+
+.section h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.section p,
+.section li {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #444;
+}
+
+.data-points li {
+  margin: 6px 0;
+}
+
+.rating-summary h3 {
+  font-size: 34px;
+  color: #0b9d58;
+  margin-bottom: 5px;
+}
+
+.bar-graph div {
+  font-size: 14px;
+  margin: 4px 0;
+  color: #555;
+}
+
+.review {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.date {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.review-text {
+  margin: 10px 0;
+  color: #444;
+}
+
+.review span {
+  color: #e25555;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .screenshots {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .screenshots img {
+    width: 80%;
+  }
+
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <img src="app.png" alt="Tap the Enemy Icon" class="app-icon">
+      <div class="app-info">
+        <h1>Tap the Enemy</h1>
+        <p class="company">MAX Apps</p>
+        <p class="meta">Contains ads · In-app purchases</p>
+        <div class="details">
+          <span>4.9 ★</span>
+          <span>1M+ Downloads</span>
+          <span>Editor’s Choice</span>
+        </div>
+        <button class="install-btn" onclick="window.location.href='game.html'">▶️ Play Game</button>
+        <button class="install-btn" onclick="window.location.href='game.html'">* Install* </button>
+        <p class="availability">This app is available for all of your devices</p>
+      </div>
+    </div>
+
+   <div class="screenshots">
+  <img src="https://image.winudf.com/v2/image/dXMuc3BhY2VzaG9vdGVyX3NjcmVlbnNob3RzXzRfYmYwZDg4ZTQ/screen-4.jpg?fakeurl=1&type=.jpg" alt="Screenshot 1">
+  <img src="https://image.winudf.com/v2/image/dXMuc3BhY2VzaG9vdGVyX3NjcmVlbnNob3RzXzRfYmYwZDg4ZTQ/screen-4.jpg?fakeurl=1&type=.jpg" alt="Screenshot 2">
+  <img src="https://image.winudf.com/v2/image/dXMuc3BhY2VzaG9vdGVyX3NjcmVlbnNob3RzXzRfYmYwZDg4ZTQ/screen-4.jpg?fakeurl=1&type=.jpg" alt="Screenshot 3">
+</div>
+
+
+    <div class="section">
+      <h2>About this game</h2>
+      <p class="about">
+        👾 Tap the Enemy – Tap fast, score high, and dominate the leaderboard!<br>
+        Improve your reaction time and beat your high score in this simple but addictive game.
+      </p>
+      <p class="updated">Updated on<br><strong>30 July 2025</strong></p>
+    </div>
+
+    <div class="section">
+      <h2>What’s new</h2>
+      <p>v1.0.0 - First official release</p>
+    </div>
+
+    <div class="section">
+      <h2>Data Safety</h2>
+      <p class="safety-note">
+        Safety starts with understanding how developers collect and share your data.
+        Privacy and security practices may vary.
+      </p>
+      <ul class="data-points">
+        <li>🔁 Shares data with third parties</li>
+        <li>📥 Collects gameplay and performance data</li>
+        <li>🔒 Data encrypted in transit</li>
+        <li>📤 Data deletion requests supported</li>
+      </ul>
+    </div>
+
+    <div class="section">
+  <h2>Ratings and reviews</h2>
+  <div class="rating-summary">
+    <h3>4.9 ★</h3>
+    <p>Reviews: 2.3K</p>
+    <div class="bar-graph">
+      <div>5 ★██████████████</div>
+      <div>4 ★█</div>
+      <div>3 ★</div>
+      <div>2 ★</div>
+      <div>1 ★</div>
+    </div>
+  </div>
+
+  <!-- Review 1 -->
+  <div class="review">
+    <p class="user-name">UUUuuzzva Hala</p>
+    <p class="date">30 July 2025</p>
+    <p class="review-text">
+      The game is incredibly fun and fast-paced! The best part is that it's light and works smoothly on any device.
+      Got my highest score last night — what a thrill!
+    </p>
+    <span>❤️ 56</span>
+  </div>
+
+  <!-- Review 2 -->
+  <div class="review">
+    <p class="user-name">Ravi Sinha</p>
+    <p class="date">29 July 2025</p>
+    <p class="review-text">
+      Super addictive! The enemies pop up fast and keep me on my toes. Would love to see more levels or new modes.
+    </p>
+    <span>❤️ 34</span>
+  </div>
+
+  <!-- Review 3 -->
+  <div class="review">
+    <p class="user-name">Meera Patel</p>
+    <p class="date">28 July 2025</p>
+    <p class="review-text">
+      Perfect game to pass time. Simple concept but well executed. Please reduce the ads a bit though 😅
+    </p>
+    <span>❤️ 42</span>
+  </div>
+
+  <!-- Review 4 -->
+  <div class="review">
+    <p class="user-name">GameMaster_007</p>
+    <p class="date">27 July 2025</p>
+    <p class="review-text">
+      I've played similar games, but this one feels smoother and cleaner. Love the retro sound effects!
+    </p>
+    <span>❤️ 51</span>
+  </div>
+</div>
+
+    </div>
+  </div>
+</body>
+</html>
