@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dodge the Rain</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      background: linear-gradient(to top, #0f0c29, #302b63, #24243e);
+      font-family: sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      border: 3px solid #fff;
+      border-radius: 12px;
+      background-color: #111;
+    }
+
+    .ui {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    #startBtn {
+      padding: 10px 20px;
+      background: #00ffcc;
+      border: none;
+      font-size: 18px;
+      color: #000;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #gameOver {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.8);
+      padding: 30px;
+      border-radius: 12px;
+      color: white;
+      text-align: center;
+      display: none;
+    }
+
+    #gameOver button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #ff4d4d;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="ui">
+  <button id="startBtn">Start Game</button>
+  <div id="scoreBox">Score: 0 | Time: 0s</div>
+</div>
+
+<canvas id="game" width="350" height="500"></canvas>
+
+<div id="gameOver">
+  <h2>Game Over!</h2>
+  <p id="finalScore"></p>
+  <button onclick="startGame()">Play Again</button>
+</div>
+
+<audio id="hitSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+<audio id="winSound" src="https://actions.google.com/sounds/v1/cartoon/concussive_hit_guitar_boing.ogg"></audio>
+
+<script>
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const startBtn = document.getElementById("startBtn");
+  const scoreBox = document.getElementById("scoreBox");
+  const gameOverScreen = document.getElementById("gameOver");
+  const finalScore = document.getElementById("finalScore");
+  const hitSound = document.getElementById("hitSound");
+  const winSound = document.getElementById("winSound");
+
+  let player, raindrops, score, time, gameInterval, dropInterval, gameOn = false;
+
+  const playerWidth = 40, playerHeight = 20;
+  const dropWidth = 10, dropHeight = 20;
+
+  function initGame() {
+    player = { x: canvas.width / 2 - playerWidth / 2, y: canvas.height - 40, w: playerWidth, h: playerHeight };
+    raindrops = [];
+    score = 0;
+    time = 0;
+    gameOn = true;
+    scoreBox.textContent = "Score: 0 | Time: 0s";
+    gameOverScreen.style.display = "none";
+  }
+
+  function drawPlayer() {
+    ctx.fillStyle = "#00ffcc";
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+  }
+
+  function drawRaindrops() {
+    ctx.fillStyle = "#00f";
+    for (let d of raindrops) {
+      ctx.fillRect(d.x, d.y, dropWidth, dropHeight);
+    }
+  }
+
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Move raindrops
+    for (let d of raindrops) d.y += 5;
+    raindrops = raindrops.filter(d => d.y < canvas.height);
+
+    // Check collisions
+    for (let d of raindrops) {
+      if (
+        d.x < player.x + player.w &&
+        d.x + dropWidth > player.x &&
+        d.y < player.y + player.h &&
+        d.y + dropHeight > player.y
+      ) {
+        endGame();
+        return;
+      }
+    }
+
+    drawPlayer();
+    drawRaindrops();
+    score += 1;
+    scoreBox.textContent = `Score: ${score} | Time: ${time}s`;
+  }
+
+  function spawnDrop() {
+    const x = Math.random() * (canvas.width - dropWidth);
+    raindrops.push({ x, y: 0 });
+  }
+
+  function movePlayer(dir) {
+    if (!gameOn) return;
+    const moveAmount = 20;
+    if (dir === "left" && player.x > 0) player.x -= moveAmount;
+    else if (dir === "right" && player.x + player.w < canvas.width) player.x += moveAmount;
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") movePlayer("left");
+    if (e.key === "ArrowRight") movePlayer("right");
+  });
+
+  canvas.addEventListener("touchstart", (e) => {
+    const x = e.touches[0].clientX;
+    if (x < window.innerWidth / 2) movePlayer("left");
+    else movePlayer("right");
+  });
+
+  function startGame() {
+    initGame();
+    startBtn.style.display = "none";
+
+    gameInterval = setInterval(update, 30);
+    dropInterval = setInterval(spawnDrop, 500);
+    setInterval(() => {
+      if (gameOn) time++;
+    }, 1000);
+  }
+
+  function endGame() {
+    gameOn = false;
+    clearInterval(gameInterval);
+    clearInterval(dropInterval);
+    hitSound.play();
+    gameOverScreen.style.display = "block";
+    finalScore.textContent = `Final Score: ${score} | Time Survived: ${time}s`;
+    startBtn.style.display = "inline-block";
+  }
+
+  // Allow start by button or space key
+  startBtn.addEventListener("click", startGame);
+</script>
+</body>
+</html>
