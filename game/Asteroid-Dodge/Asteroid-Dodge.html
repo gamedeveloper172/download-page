@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF‑8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Asteroid Dodge</title>
+  <style>
+    body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; color:#0f0; font-family:sans-serif; display:flex; flex-direction:column; align-items:center; }
+    h1 { margin-top:20px; }
+    #ui { display:flex; gap:20px; align-items:center; font-size:18px; }
+    button { padding:10px 20px; background:#0f0; color:#000; border:none; border-radius:8px; font-size:18px; cursor:pointer; }
+    #gameCanvas { background:#111; border:3px solid #0f0; border-radius:12px; margin-top:10px; touch-action:none; }
+  </style>
+</head>
+<body>
+
+<h1>🚀 Asteroid Dodge</h1>
+<div id="ui">
+  <button id="startBtn">Start Game</button>
+  <span id="timer">Time: 0s</span>
+  <span id="score">Boosts: 0</span>
+</div>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+
+<audio id="hitSound" src="https://actions.google.com/sounds/v1/impacts/crash.ogg"></audio>
+<audio id="boostSound" src="https://actions.google.com/sounds/v1/cartoon/button_press.ogg"></audio>
+
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const startBtn = document.getElementById('startBtn');
+  const timerEl = document.getElementById('timer');
+  const scoreEl = document.getElementById('score');
+  const hitSound = document.getElementById('hitSound');
+  const boostSound = document.getElementById('boostSound');
+
+  let ship, asteroids, boosts, score, timer, gameOn, lastSpawn, lastBoost, animationId, timerInterval;
+  const spawnRate = 1500;
+  const boostRate = 4000;
+
+  function resetGame(){
+    ship = { x:canvas.width/2 - 15, y:canvas.height - 60, w:30, h:30, vel:5 };
+    asteroids = [];
+    boosts = [];
+    score = 0; timer = 0;
+    timerEl.textContent = `Time: 0s`;
+    scoreEl.textContent = `Boosts: 0`;
+    lastSpawn = performance.now();
+    lastBoost = performance.now();
+  }
+
+  function spawnAsteroid(ts){
+    const size = Math.random()*30 + 20;
+    asteroids.push({ x: Math.random()*(canvas.width-size), y:-size, w:size, h:size, speed: (Math.random()*2)+1 });
+  }
+
+  function spawnBoost(ts){
+    const bsize=20;
+    boosts.push({ x: Math.random()*(canvas.width-bsize), y:-bsize, w:bsize, h:bsize, speed:2 });
+  }
+
+  function drawScene(ts){
+    if(!gameOn){ cancelAnimationFrame(animationId); clearInterval(timerInterval); return; }
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // spawn
+    if(ts - lastSpawn > spawnRate){ spawnAsteroid(ts); lastSpawn = ts; }
+    if(ts - lastBoost > boostRate){ spawnBoost(ts); lastBoost = ts; }
+
+    // draw ship
+    ctx.fillStyle='#0f0';
+    ctx.fillRect(ship.x, ship.y, ship.w, ship.h);
+
+    // update & draw boosts
+    boosts = boosts.filter(b=>{
+      b.y += b.speed;
+      ctx.fillStyle='#ff0';
+      ctx.fillRect(b.x,b.y,b.w,b.h);
+      if(collide(b,ship)){ score++; boostSound.play(); scoreEl.textContent=`Boosts: ${score}`; return false; }
+      return b.y < canvas.height;
+    });
+
+    // asteroids
+    asteroids = asteroids.filter(a=>{
+      a.y += a.speed;
+      ctx.fillStyle='#f00';
+      ctx.beginPath();
+      ctx.arc(a.x + a.w/2, a.y + a.h/2, a.w/2, 0, Math.PI*2);
+      ctx.fill();
+      if(collide(a, ship)){ collision(); return false; }
+      return a.y < canvas.height;
+    });
+
+    animationId = requestAnimationFrame(drawScene);
+  }
+
+  function collide(a, b){
+    return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
+  }
+
+  function collision(){
+    gameOn=false;
+    hitSound.play();
+    alert(`💥 Game Over! Time: ${timer}s, Boosts collected: ${score}`);
+  }
+
+  function startGame(){
+    resetGame(); gameOn=true;
+    timerInterval = setInterval(()=>{ timer++; timerEl.textContent = `Time: ${timer}s`; }, 1000);
+    lastSpawn = performance.now(); lastBoost = performance.now();
+    canvas.focus();
+    animationId = requestAnimationFrame(drawScene);
+  }
+
+  document.addEventListener('keydown', e=>{
+    if(!gameOn && e.key==='Enter') startGame();
+    if(!gameOn) return;
+    if(e.key==='ArrowLeft') ship.x = Math.max(0, ship.x - ship.vel);
+    if(e.key==='ArrowRight') ship.x = Math.min(canvas.width - ship.w, ship.x + ship.vel);
+    if(e.key==='ArrowUp') ship.y = Math.max(0, ship.y - ship.vel);
+    if(e.key==='ArrowDown') ship.y = Math.min(canvas.height - ship.h, ship.y + ship.vel);
+  });
+
+  canvas.addEventListener('touchmove', e=>{
+    if(!gameOn) return;
+    const rect = canvas.getBoundingClientRect();
+    const tx = e.touches[0].clientX - rect.left;
+    const ty = e.touches[0].clientY - rect.top;
+    ship.x = Math.min(Math.max(tx - ship.w/2, 0), canvas.width - ship.w);
+    ship.y = Math.min(Math.max(ty - ship.h/2, 0), canvas.height - ship.h);
+  });
+
+  startBtn.addEventListener('click', startGame);
+  canvas.tabIndex = 1000;
+  canvas.focus();
+</script>
+</body>
+</html>
