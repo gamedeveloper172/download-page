@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html lang="hi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🎮 Game World</title>
 
+  <!-- PWA: Manifest & Theme -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0ff" />
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="image/app-icon-192.png">
+
   <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-          crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" crossorigin="anonymous"></script>
   <script>
     (adsbygoogle = window.adsbygoogle || []).push({});
   </script>
@@ -42,7 +50,7 @@
       background-color: #1a1a1a;
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 0 10px rgba(0,255,255,0.1);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
       transition: transform 0.2s;
       text-decoration: none;
       color: inherit;
@@ -99,6 +107,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- 🔝 Top Navbar -->
@@ -106,6 +115,10 @@
 
   <!-- 🕹️ Game Grid -->
   <div class="game-grid">
+    <!-- ... same game cards as before ... -->
+    <!-- KEEP YOUR ORIGINAL GAME CARDS BELOW AS THEY ARE -->
+
+    <!-- For example: -->
     <a href="game/Tap-the-Enemy/Tap-the-Enemy.html" class="game-card">
       <img class="game-image" src="image/enemy.png" alt="Tap the Enemy">
       <div class="game-navbar">Tap the Enemy</div>
@@ -125,7 +138,7 @@
       <img class="game-image" src="image/coler.png" alt="Free Fire">
       <div class="game-navbar">Colour Matching</div>
     </a>
-    
+
     <a href="game/Fruity-Escape/Fruity-Escape.html" class="game-card">
       <img class="game-image" src="image/Fruity-Escape.png" alt="Free Fire">
       <div class="game-navbar">Fruit Catcher</div>
@@ -162,13 +175,12 @@
       <img class="game-image" src="image/asteroid.png" alt="Asteroid-Dodge">
       <div class="game-navbar">Asteroid Dodge</div>
     </a>
+
     <a href="game/Dodge The Rain/Dodge The Rain.html" class="game-card">
       <img class="game-image" src="image/dodge.png" alt="Dodge The Rain">
       <div class="game-navbar">Dodge The Rain</div>
     </a>
   </div>
-
-  
 
   <!-- 📄 Footer -->
   <footer>
@@ -178,5 +190,15 @@
     <a href="#">Contact Us</a>
   </footer>
 
+  <!-- 🔧 Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+        .catch(err => console.error('❌ Service Worker registration failed:', err));
+    }
+  </script>
+
 </body>
+
 </html>
