@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🔥 Premium Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1d1f27, #292c36);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 30px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #00ffcc, #33ccff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    canvas {
+      border: 4px solid #00ffcc;
+      background: #1e1e1e;
+      box-shadow: 0 0 20px rgba(0,255,204,0.4);
+      display: none;
+    }
+
+    #score {
+      font-size: 20px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    #startBtn, .speed-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: linear-gradient(to right, #00ffcc, #0099ff);
+      color: #000;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    #startBtn:hover, .speed-btn:hover {
+      transform: scale(1.05);
+      background: linear-gradient(to right, #00ccaa, #007acc);
+    }
+
+    .controls {
+      margin-top: 15px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐍 Premium Snake Game</h1>
+  <canvas id="game" width="400" height="400"></canvas>
+  <div id="score">Score: 0</div>
+
+  <button id="startBtn" onclick="startGame()">▶️ Start Game</button>
+
+  <div class="controls" id="speedControls">
+    <button class="speed-btn" onclick="setSpeed(300)">🐢 Slow</button>
+    <button class="speed-btn" onclick="setSpeed(150)">🚶 Medium</button>
+    <button class="speed-btn" onclick="setSpeed(70)">🏃 Fast</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const startBtn = document.getElementById("startBtn");
+    const speedControls = document.getElementById("speedControls");
+
+    const gridSize = 20;
+    const tileCount = canvas.width / gridSize;
+
+    let snake = [];
+    let dx = 1;
+    let dy = 0;
+    let food = { x: 5, y: 5 };
+    let score = 0;
+    let gameRunning = false;
+    let speed = 150;
+
+    function initSnake() {
+      snake = [];
+      for (let i = 0; i < 5; i++) {
+        snake.push({ x: 10 - i, y: 10 });
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (!gameRunning) return;
+      switch (e.key) {
+        case "ArrowUp":
+          if (dy === 0) { dx = 0; dy = -1; }
+          break;
+        case "ArrowDown":
+          if (dy === 0) { dx = 0; dy = 1; }
+          break;
+        case "ArrowLeft":
+          if (dx === 0) { dx = -1; dy = 0; }
+          break;
+        case "ArrowRight":
+          if (dx === 0) { dx = 1; dy = 0; }
+          break;
+      }
+    });
+
+    function randomFoodPosition() {
+      return {
+        x: Math.floor(Math.random() * tileCount),
+        y: Math.floor(Math.random() * tileCount)
+      };
+    }
+
+    function gameLoop() {
+      if (!gameRunning) return;
+
+      const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+      // Game Over
+      if (
+        head.x < 0 || head.y < 0 ||
+        head.x >= tileCount || head.y >= tileCount ||
+        snake.some(segment => segment.x === head.x && segment.y === head.y)
+      ) {
+        alert("💥 Game Over! Your Score: " + score);
+        gameRunning = false;
+        startBtn.style.display = "inline-block";
+        speedControls.style.display = "none";
+        return;
+      }
+
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        scoreEl.textContent = "Score: " + score;
+        food = randomFoodPosition();
+      } else {
+        snake.pop();
+      }
+
+      // Draw
+      ctx.fillStyle = "#1e1e1e";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#ff4d4d";
+      ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+
+      ctx.fillStyle = "#00ffcc";
+      for (let s of snake) {
+        ctx.fillRect(s.x * gridSize, s.y * gridSize, gridSize - 2, gridSize - 2);
+      }
+
+      setTimeout(gameLoop, speed);
+    }
+
+    function startGame() {
+      dx = 1;
+      dy = 0;
+      score = 0;
+      scoreEl.textContent = "Score: 0";
+      food = randomFoodPosition();
+      initSnake();
+      gameRunning = true;
+      canvas.style.display = "block";
+      scoreEl.style.display = "block";
+      startBtn.style.display = "none";
+      speedControls.style.display = "flex";
+      gameLoop();
+    }
+
+    function setSpeed(newSpeed) {
+      speed = newSpeed;
+    }
+  </script>
+</body>
+</html>
